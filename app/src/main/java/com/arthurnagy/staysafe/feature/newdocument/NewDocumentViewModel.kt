@@ -11,10 +11,8 @@ import com.arthurnagy.staysafe.core.model.Motive
 import com.arthurnagy.staysafe.core.model.Statement
 import com.arthurnagy.staysafe.feature.shared.mediatorLiveData
 import com.google.android.material.datepicker.MaterialDatePicker
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import timber.log.Timber
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class NewDocumentViewModel(private val statementLocalSource: StatementLocalSource) : ViewModel() {
 
     private val lastSavedStatement: LiveData<Statement?> = liveData<Statement?> {

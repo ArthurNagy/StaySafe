@@ -20,16 +20,15 @@ import com.arthurnagy.staysafe.feature.newdocument.NewDocumentViewModel
 import com.arthurnagy.staysafe.feature.shared.InAppPurchaseHelper
 import com.arthurnagy.staysafe.feature.shared.OnDisconnected
 import com.arthurnagy.staysafe.feature.shared.doIfAboveVersion
-import com.arthurnagy.staysafe.feature.shared.sharedGraphViewModel
 import com.arthurnagy.staysafe.feature.shared.showSnackbar
-import com.halcyonmobile.android.common.extensions.navigation.findSafeNavController
+import org.koin.androidx.navigation.koinNavGraphViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 import timber.log.Timber
 
 class StatementTypeFragment : Fragment(R.layout.fragment_statement_type) {
 
-    private val sharedViewModel: NewDocumentViewModel by sharedGraphViewModel(navGraphId = R.id.nav_new_document)
+    private val sharedViewModel: NewDocumentViewModel by koinNavGraphViewModel(navGraphId = R.id.nav_new_document)
     private val viewModel: StatementTypeViewModel by viewModel { parametersOf(sharedViewModel) }
     private val billingClient: BillingClient by lazy {
         BillingClient.newBuilder(requireContext())
@@ -71,7 +70,7 @@ class StatementTypeFragment : Fragment(R.layout.fragment_statement_type) {
 
     private fun setStatementStartHourAndNavigateForward(startHour: Int, binding: StatementTypeBinding) {
         viewModel.updateStatementStartHour(startHour)
-        findSafeNavController().navigate(
+        findNavController().navigate(
             StatementTypeFragmentDirections.actionStatementTypeFragmentToStatementPersonalDataFragment(),
             FragmentNavigatorExtras(
                 binding.toolbar to getString(R.string.transition_toolbar)

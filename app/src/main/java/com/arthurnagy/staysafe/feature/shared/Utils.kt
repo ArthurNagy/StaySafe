@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Build
 import android.view.InflateException
 import android.view.View
+import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.browser.customtabs.CustomTabsService.ACTION_CUSTOM_TABS_CONNECTION
 import androidx.core.graphics.drawable.toBitmap
@@ -18,11 +19,11 @@ import com.arthurnagy.staysafe.R
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import org.threeten.bp.Instant
-import org.threeten.bp.ZoneOffset
-import org.threeten.bp.format.DateTimeFormatter
-import org.threeten.bp.temporal.ChronoUnit
 import timber.log.Timber
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 private const val M = "M"
 private const val MONTH_FULL = "$M$M$M$M"
@@ -92,7 +93,9 @@ fun <T1, T2> mediatorLiveData(
 fun openUrl(context: Context, url: String) {
     if (getCustomTabsPackages(context).isNotEmpty()) {
         val customTabsIntent = CustomTabsIntent.Builder()
-            .setToolbarColor(context.color(R.color.color_primary))
+            .setDefaultColorSchemeParams(CustomTabColorSchemeParams.Builder()
+                .setToolbarColor(context.color(R.color.color_primary))
+                .build())
             .setShowTitle(true)
             .apply {
                 context.drawable(R.drawable.ic_back_24dp)?.let {

@@ -15,18 +15,17 @@ import com.arthurnagy.staysafe.StatementRouteDataBinding
 import com.arthurnagy.staysafe.feature.newdocument.NewDocumentViewModel
 import com.arthurnagy.staysafe.feature.shared.doIfAboveVersion
 import com.arthurnagy.staysafe.feature.shared.hideKeyboard
-import com.arthurnagy.staysafe.feature.shared.sharedGraphViewModel
 import com.arthurnagy.staysafe.feature.shared.tintExtendedFloatingActionButton
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.halcyonmobile.android.common.extensions.navigation.findSafeNavController
+import org.koin.androidx.navigation.koinNavGraphViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
 class StatementRouteDataFragment : Fragment(R.layout.fragment_statement_route_data) {
 
-    private val sharedViewModel by sharedGraphViewModel<NewDocumentViewModel>(navGraphId = R.id.nav_new_document)
+    private val sharedViewModel by koinNavGraphViewModel<NewDocumentViewModel>(navGraphId = R.id.nav_new_document)
     private val viewModel: StatementRouteDataViewModel by viewModel { parametersOf(sharedViewModel) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,7 +51,7 @@ class StatementRouteDataFragment : Fragment(R.layout.fragment_statement_route_da
             clickableDate.setOnClickListener { openDateSelection() }
             next.setOnClickListener {
                 view.hideKeyboard()
-                findSafeNavController().navigate(
+                findNavController().navigate(
                     StatementRouteDataFragmentDirections.actionStatementRouteDataFragmentToSignatureFragment(),
                     FragmentNavigatorExtras(
                         binding.toolbar to getString(R.string.transition_toolbar),
@@ -65,7 +64,7 @@ class StatementRouteDataFragment : Fragment(R.layout.fragment_statement_route_da
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) { navigateBack() }
     }
 
-    private fun navigateBack(){
+    private fun navigateBack() {
         findNavController().navigateUp()
         view?.hideKeyboard()
     }

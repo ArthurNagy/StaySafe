@@ -16,7 +16,6 @@ import com.arthurnagy.staysafe.feature.shared.ThemeHelper
 import com.arthurnagy.staysafe.feature.shared.provider.FileProvider
 import com.arthurnagy.staysafe.feature.shared.provider.StringProvider
 import com.google.android.gms.ads.MobileAds
-import com.jakewharton.threetenabp.AndroidThreeTen
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -30,7 +29,6 @@ class StaySafeApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        AndroidThreeTen.init(this)
         Timber.plant(Timber.DebugTree())
         startKoin {
             androidContext(this@StaySafeApplication)

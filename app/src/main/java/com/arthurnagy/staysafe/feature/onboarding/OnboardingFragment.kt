@@ -21,6 +21,7 @@ class OnboardingFragment : Fragment(R.layout.fragment_onboarding) {
             pager.setPageTransformer(false) { _, _ ->
                 // TODO: Add animation
             }
+            indicator.attachTo(pager)
             addPageChangeListenerTo(pager, onPageSelected = {
                 skip.text = getString(if (it == onboardingPagerAdapter.count - 1) R.string.start else R.string.skip)
             })

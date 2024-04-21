@@ -2,17 +2,19 @@ package com.arthurnagy.staysafe.feature.shared
 
 import android.app.Activity
 import com.android.billingclient.api.BillingClient
+import com.android.billingclient.api.BillingClient.ProductType
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.ConsumeParams
 import com.android.billingclient.api.ConsumeResult
+import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesUpdatedListener
-import com.android.billingclient.api.SkuDetails
-import com.android.billingclient.api.SkuDetailsParams
-import com.android.billingclient.api.querySkuDetails
-import com.arthurnagy.staysafe.feature.shared.InAppPurchaseHelper.isOk
+import com.android.billingclient.api.QueryProductDetailsParams
+import com.android.billingclient.api.QueryPurchasesParams
+import com.android.billingclient.api.queryProductDetails
+import com.android.billingclient.api.queryPurchasesAsync
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -44,9 +46,13 @@ object InAppPurchaseHelper {
     }
 
     suspend fun consumeAlreadyPurchased(billingClient: BillingClient) {
-        val purchasesResult = billingClient.queryPurchases(BillingClient.SkuType.INAPP)
+        val purchasesResult = billingClient.queryPurchasesAsync(
+            QueryPurchasesParams.newBuilder()
+                .setProductType(ProductType.INAPP)
+                .build()
+        )
         if (purchasesResult.billingResult.isOk) {
-            val unConsumedPurchases = purchasesResult.purchasesList?.filter { it.purchaseState == Purchase.PurchaseState.PURCHASED } ?: emptyList()
+            val unConsumedPurchases = purchasesResult.purchasesList.filter { it.purchaseState == Purchase.PurchaseState.PURCHASED }
             unConsumedPurchases.forEach { purchase ->
                 consumePurchase(billingClient, purchase)
             }
@@ -54,10 +60,16 @@ object InAppPurchaseHelper {
     }
 
     suspend fun launchBillingFlow(billingClient: BillingClient, activity: Activity): BillingResult? {
-        return querySkuDetails(billingClient)?.let { skuDetails ->
+        return querySkuDetails(billingClient)?.let { productDetails ->
             billingClient.launchBillingFlow(
                 activity, BillingFlowParams.newBuilder()
-                    .setSkuDetails(skuDetails)
+                    .setProductDetailsParamsList(
+                        listOf(
+                            BillingFlowParams.ProductDetailsParams.newBuilder()
+                                .setProductDetails(productDetails)
+                                .build()
+                        )
+                    )
                     .build()
             )
         }
@@ -88,28 +100,33 @@ object InAppPurchaseHelper {
         return result
     }
 
-    sealed class PurchaseResult {
-        object Success : PurchaseResult()
-        object Ignored : PurchaseResult()
-        object Pending : PurchaseResult()
-        object Error : PurchaseResult()
+    sealed interface PurchaseResult {
+        data object Success : PurchaseResult
+        data object Ignored : PurchaseResult
+        data object Pending : PurchaseResult
+        data object Error : PurchaseResult
     }
 
-    private suspend fun querySkuDetails(billingClient: BillingClient): SkuDetails? {
-        val skuList = ArrayList<String>()
-        skuList.add("staysafe.buy.me.a.coffee")
-        val params = SkuDetailsParams.newBuilder()
-        params.setSkusList(skuList).setType(BillingClient.SkuType.INAPP)
-        val skuDetailsResult = withContext(Dispatchers.IO) {
-            billingClient.querySkuDetails(params.build())
+    private suspend fun querySkuDetails(billingClient: BillingClient): ProductDetails? {
+        val productList = listOf(
+            QueryProductDetailsParams.Product.newBuilder()
+                .setProductId("staysafe.buy.me.a.coffee")
+                .setProductType(ProductType.SUBS)
+                .build()
+        )
+
+        val params = QueryProductDetailsParams.newBuilder().setProductList(productList).build()
+
+        val productDetailsResult = withContext(Dispatchers.IO) {
+            billingClient.queryProductDetails(params)
         }
-        Timber.d("querySkuDetails: skuDetailsResult: $skuDetailsResult, code:${skuDetailsResult.billingResult.responseCode}")
-        return if (skuDetailsResult.billingResult.isOk) {
-            skuDetailsResult.skuDetailsList?.firstOrNull()
+        Timber.d("querySkuDetails: skuDetailsResult: $productDetailsResult, code:${productDetailsResult.billingResult.responseCode}")
+        return if (productDetailsResult.billingResult.isOk) {
+            productDetailsResult.productDetailsList?.firstOrNull()
         } else null
     }
 
-    private suspend fun BillingClient.consume(consumeParams: ConsumeParams) = suspendCancellableCoroutine<ConsumeResult> {
+    private suspend fun BillingClient.consume(consumeParams: ConsumeParams) = suspendCancellableCoroutine {
         consumeAsync(consumeParams) { billingResult: BillingResult, s: String ->
             it.resume(ConsumeResult(billingResult, s))
         }
@@ -133,7 +150,6 @@ object InAppPurchaseHelper {
                 onDisconnected?.invoke()
             }
         }
-
     }
 
     abstract class SimplePurchaseListener : PurchasesUpdatedListener {

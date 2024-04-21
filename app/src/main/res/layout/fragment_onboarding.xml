@@ -17,19 +17,31 @@
             app:layout_constraintBottom_toTopOf="@id/skip"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.rd.PageIndicatorView
+        <com.tbuonomo.viewpagerdotsindicator.WormDotsIndicator
+            android:id="@+id/indicator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/second_keyline"
             app:layout_constraintBottom_toTopOf="@id/skip"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:piv_animationType="worm"
-            app:piv_padding="@dimen/first_keyline"
-            app:piv_radius="@dimen/small_shape_radius"
-            app:piv_selectedColor="?attr/colorSecondaryVariant"
-            app:piv_unselectedColor="@color/color_secondary_variant_25"
-            app:piv_viewPager="@id/pager" />
+            app:dotsColor="?attr/colorSecondaryVariant"
+            app:dotsStrokeColor="?attr/colorSecondaryVariant"
+            />
+
+<!--        <com.rd.PageIndicatorView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginBottom="@dimen/second_keyline"-->
+<!--            app:layout_constraintBottom_toTopOf="@id/skip"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:piv_animationType="worm"-->
+<!--            app:piv_padding="@dimen/first_keyline"-->
+<!--            app:piv_radius="@dimen/small_shape_radius"-->
+<!--            app:piv_selectedColor="?attr/colorSecondaryVariant"-->
+<!--            app:piv_unselectedColor="@color/color_secondary_variant_25"-->
+<!--            app:piv_viewPager="@id/pager" />-->
 
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/skip"
