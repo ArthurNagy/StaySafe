@@ -1,6 +1,5 @@
 package com.arthurnagy.staysafe.feature.home.options
 
-import android.app.Dialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -15,20 +14,15 @@ import com.arthurnagy.staysafe.feature.home.HomeViewModel
 import com.arthurnagy.staysafe.feature.shared.Event
 import com.arthurnagy.staysafe.feature.shared.ThemeHelper
 import com.arthurnagy.staysafe.feature.shared.openUrl
-import com.arthurnagy.staysafe.feature.shared.sharedGraphViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.chrisbanes.insetter.InsetterBindingAdapters
 import org.koin.android.ext.android.inject
+import org.koin.androidx.navigation.koinNavGraphViewModel
 
 class OptionsBottomSheet : BottomSheetDialogFragment() {
 
     private val preferenceManager: PreferenceManager by inject()
-    private val homeViewModel by sharedGraphViewModel<HomeViewModel>(navGraphId = R.id.nav_main)
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog = super.onCreateDialog(savedInstanceState).apply {
-        window?.decorView?.let { InsetterBindingAdapters.setEdgeToEdgeFlags(it, true) }
-    }
+    private val homeViewModel by koinNavGraphViewModel<HomeViewModel>(navGraphId = R.id.nav_main)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         OptionsBinding.inflate(inflater, container, false).apply {

@@ -7,6 +7,7 @@ import androidx.core.view.ViewCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.billingclient.api.BillingClient
@@ -20,19 +21,18 @@ import com.arthurnagy.staysafe.feature.shared.InAppPurchaseHelper
 import com.arthurnagy.staysafe.feature.shared.OnDisconnected
 import com.arthurnagy.staysafe.feature.shared.consume
 import com.arthurnagy.staysafe.feature.shared.setupSwipeToDelete
-import com.arthurnagy.staysafe.feature.shared.sharedGraphViewModel
 import com.arthurnagy.staysafe.feature.shared.showSnackbar
 import com.arthurnagy.staysafe.feature.shared.updateMargins
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.halcyonmobile.android.common.extensions.navigation.findSafeNavController
 import dev.chrisbanes.insetter.Insetter
 import org.koin.android.ext.android.inject
+import org.koin.androidx.navigation.koinNavGraphViewModel
 import timber.log.Timber
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private val preferenceManager by inject<PreferenceManager>()
-    private val viewModel by sharedGraphViewModel<HomeViewModel>(navGraphId = R.id.nav_main)
+    private val viewModel by koinNavGraphViewModel<HomeViewModel>(navGraphId = R.id.nav_main)
     private val billingClient: BillingClient by lazy {
         BillingClient.newBuilder(requireContext())
             .setListener(createPurchaseListener())
@@ -44,7 +44,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (preferenceManager.shouldShowOnboarding) {
-            findSafeNavController().navigate(HomeFragmentDirections.actionHomeFragmentToOnboardingFragment())
+            findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToOnboardingFragment())
             preferenceManager.shouldShowOnboarding = false
         }
     }
@@ -55,14 +55,14 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             viewModel = this@HomeFragment.viewModel
         }
         val documentsAdapter = DocumentsAdapter(
-            onStatementSelected = { findSafeNavController().navigate(HomeFragmentDirections.actionHomeFragmentToDocumentDetailFragment(it.id)) },
+            onStatementSelected = { findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToDocumentDetailFragment(it.id)) },
             onStatementDateUpdate = { viewModel.updateStatementDate(MaterialDatePicker.todayInUtcMilliseconds(), it) }
         )
         with(binding) {
             toolbar.setOnMenuItemClickListener {
-                consume { findSafeNavController().navigate(HomeFragmentDirections.actionHomeFragmentToOptionsBottomSheet()) }
+                consume { findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToOptionsBottomSheet()) }
             }
-            add.setOnClickListener { findSafeNavController().navigate(HomeFragmentDirections.actionHomeFragmentToNewDocument()) }
+            add.setOnClickListener { findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToNewDocument()) }
 
             with(recycler) {
                 layoutManager = LinearLayoutManager(requireContext())
@@ -84,7 +84,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 val viewBottomMargin = if (snackbarShown) initialState.margins.bottom else bottomInsetMargin + initialState.margins.bottom
                 confirmView.updateMargins(marginBottom = viewBottomMargin.toFloat())
             }
-            .consumeSystemWindowInsets(Insetter.CONSUME_AUTO)
+            .consume(Insetter.CONSUME_AUTO)
             .applyToView(binding.add)
 
 

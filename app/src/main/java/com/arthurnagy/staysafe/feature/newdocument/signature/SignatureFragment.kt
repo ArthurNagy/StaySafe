@@ -12,14 +12,13 @@ import com.arthurnagy.staysafe.R
 import com.arthurnagy.staysafe.SignatureBinding
 import com.arthurnagy.staysafe.feature.newdocument.NewDocumentViewModel
 import com.arthurnagy.staysafe.feature.shared.doIfAboveVersion
-import com.arthurnagy.staysafe.feature.shared.sharedGraphViewModel
-import com.halcyonmobile.android.common.extensions.navigation.findSafeNavController
+import org.koin.androidx.navigation.koinNavGraphViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
 class SignatureFragment : Fragment(R.layout.fragment_signature) {
 
-    private val sharedViewModel by sharedGraphViewModel<NewDocumentViewModel>(navGraphId = R.id.nav_new_document)
+    private val sharedViewModel by koinNavGraphViewModel<NewDocumentViewModel>(navGraphId = R.id.nav_new_document)
     private val viewModel: SignatureViewModel by viewModel { parametersOf(sharedViewModel) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,9 +46,11 @@ class SignatureFragment : Fragment(R.layout.fragment_signature) {
         }
         viewModel.events.observe(viewLifecycleOwner) {
             when (val action = it.consume()) {
-                is SignatureViewModel.Action.OpenDocument -> findSafeNavController().navigate(
+                is SignatureViewModel.Action.OpenDocument -> findNavController().navigate(
                     SignatureFragmentDirections.actionGlobalDocumentDetailFragment(action.documentId)
                 )
+
+                null -> Unit
             }
         }
     }

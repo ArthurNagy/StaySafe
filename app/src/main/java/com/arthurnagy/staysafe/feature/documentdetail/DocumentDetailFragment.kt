@@ -5,12 +5,17 @@ import android.content.Context
 import android.os.Bundle
 import android.print.PrintAttributes
 import android.print.PrintManager
+import android.util.DisplayMetrics
 import android.view.Gravity
 import android.view.View
+import android.view.WindowManager
+import android.view.WindowMetrics
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsCompat.Type.InsetsType
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -34,8 +39,8 @@ import dev.chrisbanes.insetter.Insetter
 import dev.chrisbanes.insetter.Side
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
-import org.threeten.bp.Instant
-import org.threeten.bp.ZoneOffset
+import java.time.Instant
+import java.time.ZoneOffset
 
 class DocumentDetailFragment : Fragment(R.layout.fragment_document_detail) {
 
@@ -103,7 +108,19 @@ class DocumentDetailFragment : Fragment(R.layout.fragment_document_detail) {
     @SuppressLint("MissingPermission")
     private fun initializeAd(coordinatorLayout: CoordinatorLayout, lifecycleOwner: LifecycleOwner) {
         val adView = AdView(requireContext()).apply {
-            adSize = AdSize.SMART_BANNER
+            val outMetrics = DisplayMetrics()
+            display.getMetrics(outMetrics)
+
+            val density = outMetrics.density
+
+            var adWidthPixels = coordinatorLayout.width.toFloat()
+            if (adWidthPixels == 0f) {
+                adWidthPixels = outMetrics.widthPixels.toFloat()
+            }
+
+            val adWidth = (adWidthPixels / density).toInt()
+
+            setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, adWidth))
             adUnitId = BuildConfig.AD_MOB_BANNER_UNIT_ID
             loadAd(AdRequest.Builder().build())
         }
@@ -114,8 +131,8 @@ class DocumentDetailFragment : Fragment(R.layout.fragment_document_detail) {
         coordinatorLayout.addView(adView, params)
 
         Insetter.builder()
-            .applySystemWindowInsetsToMargin(Side.BOTTOM)
-            .consumeSystemWindowInsets(Insetter.CONSUME_AUTO)
+            .marginBottom(WindowInsetsCompat.Type.systemBars())
+            .consume(Insetter.CONSUME_AUTO)
             .applyToView(adView)
 
         lifecycleOwner.lifecycle.addObserver(

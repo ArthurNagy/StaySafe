@@ -1,11 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 30
+    namespace = "com.github.gcacace.signaturepad"
+    compileSdk = 34
 
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 30
+        minSdkVersion 26
+        targetSdkVersion 34
         consumerProguardFiles 'proguard-rules-consumer.pro'
     }
 

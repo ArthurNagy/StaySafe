@@ -17,7 +17,6 @@ import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
-import androidx.annotation.IdRes
 import androidx.annotation.Px
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
@@ -29,19 +28,11 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.navigation.fragment.findNavController
 import androidx.viewpager.widget.ViewPager
 import com.arthurnagy.staysafe.R
 import com.arthurnagy.staysafe.core.model.Motive
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-import org.koin.android.ext.android.getKoin
-import org.koin.androidx.viewmodel.ViewModelOwner
-import org.koin.androidx.viewmodel.koin.getViewModel
-import org.koin.androidx.viewmodel.scope.BundleDefinition
-import org.koin.core.parameter.ParametersDefinition
-import org.koin.core.qualifier.Qualifier
 
 @ColorInt
 fun Context.color(@ColorRes colorRes: Int): Int = ContextCompat.getColor(this, colorRes)
@@ -52,21 +43,6 @@ fun Context.dimension(@DimenRes dimenRes: Int): Float = resources.getDimension(d
 
 @Px
 fun Context.dimensionPixel(@DimenRes dimension: Int): Int = resources.getDimensionPixelSize(dimension)
-
-inline fun <reified VM : ViewModel> Fragment.sharedGraphViewModel(
-    @IdRes navGraphId: Int,
-    qualifier: Qualifier? = null,
-    noinline initialState: BundleDefinition? = null,
-    noinline parameters: ParametersDefinition? = null
-) = lazy {
-    getKoin().getViewModel(
-        qualifier = qualifier,
-        state = initialState,
-        owner = { ViewModelOwner.from(findNavController().getViewModelStoreOwner(navGraphId)) },
-        clazz = VM::class,
-        parameters = parameters
-    )
-}
 
 fun ConstraintLayout.updateConstraintSet(updateConstraints: ConstraintSet.() -> Unit) {
     with(ConstraintSet()) {
@@ -190,9 +166,9 @@ fun View.hideKeyboard() {
 }
 
 fun ExtendedFloatingActionButton.tintExtendedFloatingActionButton() {
-    val colorOnSurface = MaterialColors.getColor(this, R.attr.colorOnSurface)
-    val colorSurface = MaterialColors.getColor(this, R.attr.colorSurface)
-    val colorSecondary = MaterialColors.getColor(this, R.attr.colorSecondary)
+    val colorOnSurface = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface)
+    val colorSurface = MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface)
+    val colorSecondary = MaterialColors.getColor(this, com.google.android.material.R.attr.colorSecondary)
 
     val backgroundColorStateList: ColorStateList by lazy {
         val backgroundColors = IntArray(buttonBackgroundStates.size)

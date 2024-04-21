@@ -15,20 +15,19 @@ import com.arthurnagy.staysafe.StatementPersonalDataBinding
 import com.arthurnagy.staysafe.feature.newdocument.NewDocumentViewModel
 import com.arthurnagy.staysafe.feature.shared.doIfAboveVersion
 import com.arthurnagy.staysafe.feature.shared.hideKeyboard
-import com.arthurnagy.staysafe.feature.shared.sharedGraphViewModel
 import com.arthurnagy.staysafe.feature.shared.tintExtendedFloatingActionButton
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.halcyonmobile.android.common.extensions.navigation.findSafeNavController
+import org.koin.androidx.navigation.koinNavGraphViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
-import org.threeten.bp.LocalDate
-import org.threeten.bp.ZoneOffset
+import java.time.LocalDate
+import java.time.ZoneOffset
 
 class StatementPersonalDataFragment : Fragment(R.layout.fragment_statement_personal_data) {
 
-    private val sharedViewModel: NewDocumentViewModel by sharedGraphViewModel(navGraphId = R.id.nav_new_document)
+    private val sharedViewModel: NewDocumentViewModel by koinNavGraphViewModel(navGraphId = R.id.nav_new_document)
     private val viewModel: StatementPersonalDataViewModel by viewModel { parametersOf(sharedViewModel) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,7 +52,7 @@ class StatementPersonalDataFragment : Fragment(R.layout.fragment_statement_perso
             clickableBirthDate.setOnClickListener { openBirthDateSelection() }
             next.setOnClickListener {
                 view.hideKeyboard()
-                findSafeNavController().navigate(
+                findNavController().navigate(
                     StatementPersonalDataFragmentDirections.actionStatementPersonalDataFragmentToStatementRouteDataFragment(),
                     FragmentNavigatorExtras(
                         binding.toolbar to getString(R.string.transition_toolbar),
